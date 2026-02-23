@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>淡紫人生 · Ultra版</title>
+<style>
+body{
+margin:0;
+font-family:"Microsoft YaHei";
+background:linear-gradient(135deg,#e9d8ff,#f5ecff);
+color:#4b2e83;
+}
+.app{
+width:430px;
+margin:20px auto;
+background:rgba(255,255,255,0.75);
+border-radius:25px;
+padding:20px;
+box-shadow:0 0 40px rgba(170,130,255,0.5);
+}
+h2{text-align:center;}
+.stats div{font-size:13px;margin:3px 0;}
+button{
+width:100%;
+margin:4px 0;
+padding:8px;
+border:none;
+border-radius:12px;
+background:#c8a2ff;
+color:white;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+box-shadow:0 0 10px #c8a2ff;
+}
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 25px #a66cff;
+}
+.log{
+height:120px;
+overflow:auto;
+background:white;
+padding:10px;
+border-radius:10px;
+font-size:12px;
+}
+.char{
+text-align:center;
+font-size:50px;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+<h2>🌙 淡紫人生 · Ultra</h2>
+
+<div class="char" id="char">🙂</div>
+
+<div>
+📅 第 <span id="day">1</span> 天 |
+📆 第 <span id="month">1</span> 月 |
+📆 第 <span id="year">1</span> 年 |
+🕒 <span id="hour">8</span>:00
+</div>
+
+<div class="stats">
+<div>💰 金钱: <span id="money"></span></div>
+<div>😊 心情: <span id="mood"></span></div>
+<div>📚 学识: <span id="knowledge"></span></div>
+<div>❤️ 健康: <span id="health"></span></div>
+<div>😵 压力: <span id="stress"></span></div>
+<div>💘 好感A: <span id="loveA"></span></div>
+<div>💘 好感B: <span id="loveB"></span></div>
+<div>💘 好感C: <span id="loveC"></span></div>
+<div>✈️ 出国基金: <span id="dream"></span>/2000</div>
+</div>
+
+<button onclick="study()">📖 学习</button>
+<button onclick="partTime()">💼 兼职</button>
+<button onclick="fullTime()">🏢 正职</button>
+<button onclick="date('A')">💘 约会A</button>
+<button onclick="date('B')">💘 约会B</button>
+<button onclick="date('C')">💘 约会C</button>
+<button onclick="explore()">🎲 探索</button>
+<button onclick="rest()">🛌 休息</button>
+<button onclick="save()">💾 存档</button>
+<button onclick="load()">📂 读档</button>
+
+<div class="log" id="log"></div>
+</div>
+
+<audio autoplay loop>
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b1e7a.mp3">
+</audio>
+
+<script>
+
+let S={
+day:1,month:1,year:1,hour:8,
+money:300,mood:80,knowledge:50,
+health:80,stress:10,
+loveA:0,loveB:0,loveC:0,
+dream:0
+};
+
+function update(){
+for(let k in S){
+if(document.getElementById(k))
+document.getElementById(k).innerText=S[k];
+}
+}
+
+function log(t){
+document.getElementById("log").innerHTML="<div>"+t+"</div>"+document.getElementById("log").innerHTML;
+}
+
+function time(){
+S.hour+=2;
+S.stress+=2;
+if(S.hour>=24){S.hour-=24;S.day++;S.mood-=5;}
+if(S.day>30){S.day=1;S.month++;rent();}
+if(S.month>12){S.month=1;S.year++;}
+random();
+update();
+checkEnding();
+}
+
+function rent(){
+S.money-=200;
+log("🏠 房租 -200");
+if(S.money<0){S.stress+=30;log("⚠️ 破产边缘！");}
+}
+
+function random(){
+if(Math.random()<0.3){
+let e=[
+()=>{S.mood+=15;log("💖 被夸奖，心情上升");},
+()=>{S.health-=10;log("🤒 生病了");},
+()=>{S.money+=100;log("✨ 奖学金到账");},
+()=>{S.stress+=20;log("📚 考试周暴击");}
+];
+e[Math.floor(Math.random()*e.length)]();
+}
+}
+
+function study(){
+S.knowledge+=10;
+S.stress+=5;
+time();
+}
+
+function partTime(){
+S.money+=50;
+S.dream+=20;
+S.mood-=5;
+time();
+}
+
+function fullTime(){
+S.money+=120;
+S.stress+=10;
+time();
+}
+
+function date(who){
+S["love"+who]+=15;
+S.mood+=10;
+log("💘 和 "+who+" 约会成功");
+time();
+}
+
+function explore(){
+S.money+=Math.floor(Math.random()*200);
+time();
+}
+
+function rest(){
+S.health+=15;
+S.stress-=15;
+time();
+}
+
+function checkEnding(){
+if(S.dream>=2000){
+alert("🎉 你实现了海外梦想结局！");
+}
+if(S.money<-300){
+alert("💀 破产结局");
+}
+if(S.loveA>=200||S.loveB>=200||S.loveC>=200){
+alert("💍 恋爱结局达成！");
+}
+if(S.stress>200){
+alert("😵 崩溃结局");
+}
+}
+
+function save(){
+localStorage.setItem("ultraSave",JSON.stringify(S));
+log("💾 已存档");
+}
+
+function load(){
+let d=localStorage.getItem("ultraSave");
+if(d){S=JSON.parse(d);update();log("📂 已读档");}
+}
+
+update();
+
+</script>
+</body>
+</html>
